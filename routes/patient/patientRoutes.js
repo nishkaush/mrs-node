@@ -26,7 +26,7 @@ patientRouter.get("/search", (req, res) => {
     patient_id,
     CONCAT(firstName,IF(middleName="","",CONCAT(" ",middleName))," ",lastName) AS fullName,phone 
     FROM patients
-    WHERE CONCAT(firstName," ",middleName," ",lastName)=?;
+    WHERE CONCAT(firstName," ",middleName," ",lastName) LIKE ?;
     `;
   } else {
     myQuery = `
@@ -34,14 +34,17 @@ patientRouter.get("/search", (req, res) => {
     patient_id,
     CONCAT(firstName,IF(middleName="","",CONCAT(" ",middleName))," ",lastName) AS fullName,phone 
     FROM patients
-    WHERE ${req.query.queryName}=?
+    WHERE ${req.query.queryName} LIKE ?
     `;
   }
 
-  connection.query(myQuery, [`${req.query.value}`], (err, results, fields) => {
-    err ? console.log(err) : console.log(results);
-    res.send(results);
-  });
+  connection.query(
+    myQuery,
+    [`%${req.query.value}%`],
+    (err, results, fields) => {
+      res.send(results);
+    }
+  );
 });
 
 module.exports = { patientRouter };
