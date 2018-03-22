@@ -11,14 +11,11 @@ patientRouter.post("/addNewPatient", (req, res) => {
   WHERE patient_id=LAST_INSERT_ID();
   `;
   connection.query(myQuery, req.body, (err, results, fields) => {
-    err ? console.log(err) : console.log(results[1][0]);
-    res.send(results[1][0]);
-    // results[1][0]["LAST_INSERT_ID()"]
+    err ? console.log(err) : res.send(results[1][0]);
   });
 });
 
 patientRouter.get("/search", (req, res) => {
-  console.log(req.query);
   let myQuery = "";
   if (req.query.queryName === "fullName") {
     myQuery = `
@@ -45,6 +42,15 @@ patientRouter.get("/search", (req, res) => {
       res.send(results);
     }
   );
+});
+
+patientRouter.get("/deletePatient/:id", (req, res) => {
+  const myQuery = `
+  DELETE FROM patients WHERE patient_id=?
+  `;
+  connection.query(myQuery, req.params.id, (err, results, fields) => {
+    err ? res.send(err) : res.send(results);
+  });
 });
 
 module.exports = { patientRouter };
